@@ -10,8 +10,12 @@ export const AddTodoForm = () => {
   });
   return (
     <form action={createTodo} ref={ref}>
-      <input type="text" size={50} name="title" />
-      <button type="submit">Create Todo</button>
+      <input
+        className="new-todo"
+        placeholder="What needs to be done?"
+        autoFocus
+        name="title"
+      />
     </form>
   );
 };

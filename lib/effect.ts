@@ -25,9 +25,12 @@ export interface NextRuntime<R> {
     <E, A>(layer: Layer.Layer<never, E, A>): NextRuntime<A | R>;
   };
   effectComponent: <E, A>(body: Effect.Effect<R, E, A>) => () => Promise<A>;
-  effectAction: <E, A>(
+  effectFormAction: <E, A>(
     body: (formData: FormData) => Effect.Effect<R | FormDataService, E, A>
   ) => (formData: FormData) => Promise<A>;
+  effectAction: <E, A, Args extends unknown[]>(
+    body: (...args: Args) => Effect.Effect<R | FormDataService, E, A>
+  ) => (...args: Args) => Promise<A>;
 }
 
 export const nextRuntime: {
@@ -79,7 +82,11 @@ export const nextRuntime: {
     runtime: makeRuntime,
     childRuntime: (layer: any) => nextRuntime(makeRuntime, layer),
     effectComponent: (self: any) => () => run(self),
-    effectAction: (body: any) => (data: any) =>
+    effectFormAction: (body: any) => (data: any) =>
       run(Effect.provideService(FormDataService, data)(body(data))),
+    effectAction:
+      (body: any) =>
+      (...data: any) =>
+        run(Effect.provideService(FormDataService, data)(body(...data))),
   } as any;
 };

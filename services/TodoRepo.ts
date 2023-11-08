@@ -17,7 +17,9 @@ import { Sql, SqlLive } from "./Sql";
 export class Todo extends Schema.Class<Todo>()({
   id: Schema.number,
   title: Schema.string,
+  status: Schema.literal("COMPLETED", "CREATED"),
   createdAt: Schema.dateFromString(Schema.string),
+  updatedAt: Schema.dateFromString(Schema.string),
 }) {}
 
 export const TodoArray = Schema.array(Todo);
@@ -27,21 +29,13 @@ export class GetAllTodosError extends Data.TaggedError("GetAllTodosError")<{
 }> {}
 
 //
-// Policies
-//
-
-const retryPolicy = Schedule.exponential("10 millis").pipe(
-  Schedule.compose(Schedule.elapsed),
-  Schedule.whileOutput(Duration.lessThan("3 seconds"))
-);
-
-//
 // Metrics
 //
 
 const getAllTodosErrorCount = Metric.counter("getAllTodosErrorCount");
 const addTodoErrorCount = Metric.counter("addTodoErrorCount");
 const deleteTodoErrorCount = Metric.counter("deleteTodoErrorCount");
+const completeTodoErrorCount = Metric.counter("completeTodoErrorCount");
 
 //
 // Service Definition
@@ -94,6 +88,18 @@ export const makeTodoRepo = Effect.gen(function* ($) {
       Effect.withSpan("deleteTodo")
     );
 
+  const updateTodo = (id: number, status: Todo["status"]) =>
+    Effect.gen(function* ($) {
+      yield* $(
+        Effect.orDie(sql`UPDATE todos SET status = ${status} WHERE id = ${id}`),
+        Effect.withSpan("completeFromDb")
+      );
+    }).pipe(
+      sql.withTransaction,
+      Metric.trackErrorWith(completeTodoErrorCount, () => 1),
+      Effect.withSpan("completeTodo")
+    );
+
   const getAllTodos = Effect.gen(function* ($) {
     const rows = yield* $(
       Effect.orDie(sql`SELECT * from todos;`),
@@ -103,25 +109,17 @@ export const makeTodoRepo = Effect.gen(function* ($) {
       Effect.orDie(Schema.parse(TodoArray)(rows)),
       Effect.withSpan("parseTodos")
     );
-    if (Math.random() > 0.5) {
-      return yield* $(
-        new GetAllTodosError({
-          message: "failure to get todos",
-        })
-      );
-    }
     return todos;
   }).pipe(
     Metric.trackErrorWith(getAllTodosErrorCount, () => 1),
-    Effect.withSpan("getAllTodos"),
-    Effect.retry(retryPolicy),
-    Effect.withSpan("getAllTodosWithRetry")
+    Effect.withSpan("getAllTodos")
   );
 
   return {
     getAllTodos,
     addTodo,
     deleteTodo,
+    updateTodo,
   };
 });
 

@@ -37,7 +37,3 @@ next-env.d.ts
 
 ## direnv
 .direnv
-
-## sqlite
-db.sqlite-wal
-db.sqlite-shm

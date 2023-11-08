@@ -9,6 +9,6 @@ const { childRuntime } = globalValue("@app/GlobalRuntime", () =>
   nextRuntime(SqlLive.pipe(Layer.useMerge(TracingLive)))
 );
 
-export const { effectComponent, effectAction } = childRuntime(
+export const { effectComponent, effectFormAction, effectAction } = childRuntime(
   Layer.mergeAll(TodoRepoLive)
 );

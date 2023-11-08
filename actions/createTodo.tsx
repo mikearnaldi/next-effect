@@ -1,13 +1,13 @@
 "use server";
 
 import { getFormData } from "@/lib/effect";
-import { effectAction } from "@/services/Runtime";
+import { effectFormAction } from "@/services/Runtime";
 import { TodoRepo } from "@/services/TodoRepo";
 import { Schema } from "@effect/schema";
 import { Effect } from "effect";
 import { revalidatePath } from "next/cache";
 
-export const createTodo = effectAction(() =>
+export const createTodo = effectFormAction(() =>
   Effect.gen(function* ($) {
     const todos = yield* $(TodoRepo);
     const { title } = yield* $(

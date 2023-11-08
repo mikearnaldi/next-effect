@@ -12,16 +12,21 @@ export default effectComponent(
       Schema.encode(TodoArray)(yield* $(todoRepo.getAllTodos))
     );
     return (
-      <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-        <h1>Todos</h1>
-        <ul>
-          {todos.map((todo) => (
-            <TodoRow todo={todo} key={todo.id} />
-          ))}
-        </ul>
-        <h2>Add New Todo</h2>
-        <AddTodoForm />
-      </div>
+      <section className="todoapp">
+        <header className="header">
+          <h1>todos</h1>
+          <AddTodoForm />
+        </header>
+        <section className="main">
+          <input id="toggle-all" className="toggle-all" type="checkbox" />
+          <label htmlFor="toggle-all">Mark all as complete</label>
+          <ul className="todo-list">
+            {todos.map((todo) => (
+              <TodoRow todo={todo} key={todo.id} />
+            ))}
+          </ul>
+        </section>
+      </section>
     );
   })
 );

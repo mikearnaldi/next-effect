@@ -1,9 +1,10 @@
 "use client";
 
 import { deleteTodo } from "@/actions/deleteTodo";
+import { updateTodo } from "@/actions/updateTodo";
 import { Todo } from "@/services/TodoRepo";
 import { Schema } from "@effect/schema";
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export const TodoRow = ({
   todo,
@@ -14,18 +15,21 @@ export const TodoRow = ({
   useEffect(() => {
     ref.current?.reset();
   });
+  const isCompleted = todo.status === "COMPLETED";
   return (
-    <li>
-      <div style={{ display: "flex", gap: "0.5em" }}>
-        <div>
-          {todo.title} ({todo.createdAt})
-        </div>
-        <div>
-          <form ref={ref} action={deleteTodo}>
-            <input type="hidden" name="id" value={todo.id} />
-            <button type="submit">Done</button>
-          </form>
-        </div>
+    <li className={isCompleted ? "completed" : ""} key={todo.id}>
+      <div className="view">
+        <input
+          className="toggle"
+          type="checkbox"
+          checked={isCompleted}
+          readOnly
+          onClick={() =>
+            updateTodo(todo.id, isCompleted ? "CREATED" : "COMPLETED")
+          }
+        />
+        <label>{todo.title}</label>
+        <button className="destroy" onClick={() => deleteTodo(todo.id)} />
       </div>
     </li>
   );
