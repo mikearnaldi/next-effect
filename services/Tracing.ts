@@ -47,11 +47,5 @@ export const TracingLive = Layer.unwrapEffect(
         exportIntervalMillis: Duration.toMillis("5 seconds"),
       }),
     }));
-  }).pipe(
-    Effect.orElse(() =>
-      Effect.succeed(Layer.succeedContext(Context.empty())).pipe(
-        Effect.tap(() => Effect.logWarning("Telemetry not configured"))
-      )
-    )
-  )
+  }).pipe(Effect.orElseSucceed(() => Layer.succeedContext(Context.empty())))
 );
