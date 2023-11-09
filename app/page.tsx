@@ -5,12 +5,15 @@ import { TodoArray, TodoRepo } from "@/services/TodoRepo";
 import { Schema } from "@effect/schema";
 import { Effect } from "effect";
 
+const getAllTodos = Effect.gen(function* ($) {
+  const todoRepo = yield* $(TodoRepo);
+  const todos = yield* $(todoRepo.getAllTodos);
+  return yield* $(Schema.encode(TodoArray)(todos));
+});
+
 export default effectComponent(
   Effect.gen(function* ($) {
-    const todoRepo = yield* $(TodoRepo);
-    const todos = yield* $(
-      Schema.encode(TodoArray)(yield* $(todoRepo.getAllTodos))
-    );
+    const todos = yield* $(getAllTodos);
     return (
       <section className="todoapp">
         <header className="header">
