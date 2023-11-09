@@ -1,5 +1,5 @@
-import { Schema } from "@effect/schema";
-import { Context, Effect, Exit, Layer, Runtime, Scope } from "effect";
+import { ParseResult, Schema } from "@effect/schema";
+import { Context, Effect, Exit, Layer, Runtime, Scope, absurd } from "effect";
 import { pretty } from "effect/Cause";
 import { defaultRuntime, makeFiberFailure } from "effect/Runtime";
 
@@ -10,6 +10,27 @@ export interface FormDataService {
 export const FormDataService = Context.Tag<FormDataService, FormData>(
   "@services/FormDataService"
 );
+
+const FormDataSchema = Schema.unknown.pipe(
+  Schema.filter((u): u is FormData => u instanceof FormData)
+);
+
+export const formData = <I extends { [k: string]: string }, A>(
+  schema: Schema.Schema<I, A>
+) =>
+  Schema.transformOrFail(
+    Schema.to(FormDataSchema),
+    schema,
+    (_) => Schema.parse(Schema.from(schema))(Object.fromEntries(_)),
+    (_) =>
+      ParseResult.map(Schema.encode(Schema.from(schema))(_), (i) => {
+        const data = new FormData();
+        Object.keys(i as any).map((k) => {
+          data.append(k, i[k]);
+        });
+        return data;
+      })
+  );
 
 export const getFormData = <I, A>(schema: Schema.Schema<I, A>) =>
   Effect.flatMap(FormDataService, (entries) =>
@@ -25,12 +46,25 @@ export interface NextRuntime<R> {
     <E, A>(layer: Layer.Layer<never, E, A>): NextRuntime<A | R>;
   };
   effectComponent: <E, A>(body: Effect.Effect<R, E, A>) => () => Promise<A>;
-  effectFormAction: <E, A>(
-    body: (formData: FormData) => Effect.Effect<R | FormDataService, E, A>
-  ) => (formData: FormData) => Promise<A>;
-  effectAction: <E, A, Args extends unknown[]>(
-    body: (...args: Args) => Effect.Effect<R | FormDataService, E, A>
-  ) => (...args: Args) => Promise<A>;
+  effectAction: <Schemas extends Schema.Schema<any, any>[]>(
+    ...schemas: Schemas
+  ) => <
+    E,
+    A,
+    Args extends { [k in keyof Schemas]: Schema.Schema.To<Schemas[k]> }
+  >(
+    body: (...args: Args) => Effect.Effect<R, E, A>
+  ) => (
+    ...args: {
+      [k in keyof Args]: k extends keyof Schemas
+        ? Schemas[k] extends Schema.Schema<any, any>
+          ? Schema.Schema.From<Schemas[k]>
+          : never
+        : never;
+    } extends infer X extends ReadonlyArray<any>
+      ? X
+      : []
+  ) => Promise<A>;
 }
 
 export const nextRuntime: {
@@ -82,11 +116,23 @@ export const nextRuntime: {
     runtime: makeRuntime,
     childRuntime: (layer: any) => nextRuntime(makeRuntime, layer),
     effectComponent: (self: any) => () => run(self),
-    effectFormAction: (body: any) => (data: any) =>
-      run(Effect.provideService(FormDataService, data)(body(data))),
     effectAction:
-      (body: any) =>
-      (...data: any) =>
-        run(Effect.provideService(FormDataService, data)(body(...data))),
+      <Schemas extends Schema.Schema<any, any>[]>(...schemas: Schemas) =>
+      <E, A>(
+        body: (
+          ...args: { [k in keyof Schemas]: Schema.Schema.To<Schemas[k]> }
+        ) => Effect.Effect<any, E, A>
+      ) =>
+      (
+        ...args: { [k in keyof Schemas]: Schema.Schema.From<Schemas[k]> }
+      ): Promise<A> => {
+        return Effect.all(
+          schemas.map((schema, i) => Schema.parse(schema)(args[i]))
+        ).pipe(
+          Effect.orDie,
+          Effect.flatMap((decoded) => body(...(decoded as any))),
+          run
+        );
+      },
   } as any;
 };

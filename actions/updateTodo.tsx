@@ -1,11 +1,15 @@
 "use server";
 
 import { effectAction } from "@/services/Runtime";
-import { Todo, TodoRepo } from "@/services/TodoRepo";
+import { TodoRepo, TodoStatus } from "@/services/TodoRepo";
+import { Schema } from "@effect/schema";
 import { Effect } from "effect";
 import { revalidatePath } from "next/cache";
 
-export const updateTodo = effectAction((id: number, status: Todo["status"]) =>
+export const updateTodo = effectAction(
+  Schema.number,
+  TodoStatus
+)((id, status) =>
   Effect.gen(function* ($) {
     const todos = yield* $(TodoRepo);
     yield* $(todos.updateTodo(id, status));

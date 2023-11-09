@@ -14,10 +14,12 @@ import { Sql, SqlLive } from "./Sql";
 // Data Model
 //
 
+export const TodoStatus = Schema.literal("COMPLETED", "CREATED");
+
 export class Todo extends Schema.Class<Todo>()({
   id: Schema.number,
   title: Schema.string,
-  status: Schema.literal("COMPLETED", "CREATED"),
+  status: TodoStatus,
   createdAt: Schema.dateFromString(Schema.string),
   updatedAt: Schema.dateFromString(Schema.string),
 }) {}
