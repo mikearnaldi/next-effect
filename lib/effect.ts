@@ -1,7 +1,9 @@
 import { ParseResult, Schema } from "@effect/schema";
 import { Effect, Exit, Layer, Runtime, Scope } from "effect";
 import { pretty } from "effect/Cause";
+import { globalValue } from "effect/GlobalValue";
 import { defaultRuntime, makeFiberFailure } from "effect/Runtime";
+import { CloseableScope } from "effect/Scope";
 
 const FormDataSchema = Schema.unknown.pipe(
   Schema.filter((u): u is FormData => u instanceof FormData)
@@ -26,9 +28,9 @@ export const formData = <I extends { [k: string]: string }, A>(
 
 export interface NextRuntime<R> {
   runEffect: <E, A>(body: Effect.Effect<R, E, A>) => Promise<A>;
-  runtime: Promise<Runtime.Runtime<R>>;
+  runtime: Promise<Runtime.Runtime<R> & { scope: CloseableScope }>;
   childRuntime: {
-    <E, A>(layer: Layer.Layer<never, E, A>): NextRuntime<A | R>;
+    <E, A>(layer: Layer.Layer<R, E, A>): NextRuntime<A | R>;
   };
   effectComponent: <E, A>(body: Effect.Effect<R, E, A>) => () => Promise<A>;
   effectAction: <Schemas extends Schema.Schema<any, any>[]>(
@@ -52,14 +54,13 @@ export interface NextRuntime<R> {
   ) => Promise<A>;
 }
 
-export const nextRuntime: {
+const nextRuntime: {
   <E, A, R>(
     parent: Promise<Runtime.Runtime<R>>,
     layer: Layer.Layer<never, E, A>
   ): NextRuntime<A>;
   <E, A>(layer: Layer.Layer<never, E, A>): NextRuntime<A>;
 } = function () {
-  console.log("AAA");
   const layer: Layer.Layer<never, any, any> =
     arguments.length === 1 ? arguments[0] : arguments[1];
 
@@ -71,7 +72,10 @@ export const nextRuntime: {
       Effect.gen(function* ($) {
         const scope = yield* $(Scope.make());
         const runtime = yield* $(Layer.toRuntime(layer), Scope.extend(scope));
-        return runtime;
+        return {
+          ...runtime,
+          scope,
+        };
       })
     )
   );
@@ -121,4 +125,19 @@ export const nextRuntime: {
         );
       },
   } as any;
+};
+
+export const integrate = <E, R, E1, R1>(
+  globalLayer: Layer.Layer<never, E, R>,
+  localLayer: Layer.Layer<R, E1, R1>
+) => {
+  const { childRuntime } = globalValue("@app/GlobalRuntime", () =>
+    nextRuntime(globalLayer)
+  );
+
+  const makeLocalRuntime = () => childRuntime(localLayer);
+
+  const { effectComponent, effectAction } = makeLocalRuntime();
+
+  return { effectComponent, effectAction };
 };

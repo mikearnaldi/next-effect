@@ -1,14 +1,10 @@
+import { integrate } from "@/lib/effect";
 import { Layer } from "effect";
 import { SqlLive } from "./Sql";
-import { TracingLive } from "./Tracing";
-import { nextRuntime } from "@/lib/effect";
-import { globalValue } from "effect/GlobalValue";
 import { TodoRepoLive } from "./TodoRepo";
+import { TracingLive } from "./Tracing";
 
-const { childRuntime } = globalValue("@app/GlobalRuntime", () =>
-  nextRuntime(SqlLive.pipe(Layer.useMerge(TracingLive)))
-);
-
-export const { effectComponent, effectAction } = childRuntime(
+export const { effectComponent, effectAction } = integrate(
+  TracingLive.pipe(Layer.provideMerge(SqlLive)),
   Layer.mergeAll(TodoRepoLive)
 );

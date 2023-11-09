@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production next start",
     "lint": "next lint",
     "migrate": "ts-node database/migrate.ts",
     "clean": "rm -rf .next"
