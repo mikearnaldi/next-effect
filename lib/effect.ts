@@ -1,15 +1,7 @@
 import { ParseResult, Schema } from "@effect/schema";
-import { Context, Effect, Exit, Layer, Runtime, Scope, absurd } from "effect";
+import { Effect, Exit, Layer, Runtime, Scope } from "effect";
 import { pretty } from "effect/Cause";
 import { defaultRuntime, makeFiberFailure } from "effect/Runtime";
-
-export interface FormDataService {
-  readonly _: unique symbol;
-}
-
-export const FormDataService = Context.Tag<FormDataService, FormData>(
-  "@services/FormDataService"
-);
 
 const FormDataSchema = Schema.unknown.pipe(
   Schema.filter((u): u is FormData => u instanceof FormData)
@@ -31,13 +23,6 @@ export const formData = <I extends { [k: string]: string }, A>(
         return data;
       })
   );
-
-export const getFormData = <I, A>(schema: Schema.Schema<I, A>) =>
-  Effect.flatMap(FormDataService, (entries) =>
-    Schema.parse(schema)(Object.fromEntries(entries)).pipe(
-      Effect.withSpan("parseFormData")
-    )
-  ).pipe(Effect.withSpan("getFormData"));
 
 export interface NextRuntime<R> {
   runEffect: <E, A>(body: Effect.Effect<R, E, A>) => Promise<A>;
@@ -74,6 +59,7 @@ export const nextRuntime: {
   ): NextRuntime<A>;
   <E, A>(layer: Layer.Layer<never, E, A>): NextRuntime<A>;
 } = function () {
+  console.log("AAA");
   const layer: Layer.Layer<never, any, any> =
     arguments.length === 1 ? arguments[0] : arguments[1];
 
