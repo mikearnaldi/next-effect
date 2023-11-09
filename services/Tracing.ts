@@ -24,11 +24,7 @@ export const HoneycombConfig = Config.nested("HONEYCOMB")(
 
 export const TracingLive = Layer.unwrapEffect(
   Effect.gen(function* ($) {
-    const config = yield* $(Effect.either(Effect.config(HoneycombConfig)));
-    if (Either.isLeft(config)) {
-      return Layer.succeedContext(Context.empty());
-    }
-    const { apiKey, serviceName } = config.right;
+    const { apiKey, serviceName } = yield* $(Effect.config(HoneycombConfig));
     const headers = {
       "x-honeycomb-team": ConfigSecret.value(apiKey),
       "x-honeycomb-dataset": serviceName,
@@ -51,5 +47,11 @@ export const TracingLive = Layer.unwrapEffect(
         exportIntervalMillis: Duration.toMillis("5 seconds"),
       }),
     }));
-  })
+  }).pipe(
+    Effect.orElse(() =>
+      Effect.succeed(Layer.succeedContext(Context.empty())).pipe(
+        Effect.tap(() => Effect.logWarning("Telemetry not configured"))
+      )
+    )
+  )
 );
