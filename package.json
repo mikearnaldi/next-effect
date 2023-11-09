@@ -30,8 +30,8 @@
     "dotenv": "^16.3.1",
     "effect": "2.0.0-next.52",
     "next": "14.0.1",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "todomvc-app-css": "^2.4.3",
     "todomvc-common": "^1.0.5",
     "ts-node": "^10.9.1"
@@ -39,8 +39,8 @@
   "devDependencies": {
     "@effect/language-service": "^0.0.21",
     "@types/node": "^20",
-    "@types/react": "18.2.20",
-    "@types/react-dom": "18.2.7",
+    "@types/react": "18.2.37",
+    "@types/react-dom": "18.2.15",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.1",
