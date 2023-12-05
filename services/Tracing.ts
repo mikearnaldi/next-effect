@@ -1,13 +1,5 @@
 import * as NodeSdk from "@effect/opentelemetry/NodeSdk";
-import {
-  Config,
-  ConfigSecret,
-  Context,
-  Duration,
-  Effect,
-  Either,
-  Layer,
-} from "effect";
+import { Config, ConfigSecret, Context, Duration, Effect, Layer } from "effect";
 import {
   BatchSpanProcessor,
   OTLPMetricExporter,

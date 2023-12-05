@@ -6,11 +6,11 @@ settings:
 
 dependencies:
   '@effect/opentelemetry':
-    specifier: ^0.21.1
-    version: 0.21.1(@opentelemetry/api@1.7.0)(effect@2.0.0-next.52)
+    specifier: ^0.25.1
+    version: 0.25.1(@opentelemetry/api@1.7.0)(@opentelemetry/resources@1.18.1)(@opentelemetry/sdk-metrics@1.18.1)(@opentelemetry/sdk-trace-base@1.18.1)(@opentelemetry/semantic-conventions@1.18.1)(effect@2.0.0-next.58)
   '@effect/schema':
-    specifier: ^0.46.4
-    version: 0.46.4(effect@2.0.0-next.52)(fast-check@3.14.0)
+    specifier: ^0.51.4
+    version: 0.51.4(effect@2.0.0-next.58)(fast-check@3.14.0)
   '@opentelemetry/api':
     specifier: ^1.7.0
     version: 1.7.0
@@ -48,8 +48,8 @@ dependencies:
     specifier: ^1.18.1
     version: 1.18.1(@opentelemetry/api@1.7.0)
   '@sqlfx/sqlite':
-    specifier: ^0.29.1
-    version: 0.29.1(@effect/schema@0.46.4)(better-sqlite3@9.2.2)(effect@2.0.0-next.52)
+    specifier: ^0.33.1
+    version: 0.33.1(@effect/schema@0.51.4)(better-sqlite3@9.2.2)(effect@2.0.0-next.58)
   better-sqlite3:
     specifier: ^9.2.2
     version: 9.2.2
@@ -57,8 +57,8 @@ dependencies:
     specifier: ^16.3.1
     version: 16.3.1
   effect:
-    specifier: 2.0.0-next.52
-    version: 2.0.0-next.52
+    specifier: 2.0.0-next.58
+    version: 2.0.0-next.58
   next:
     specifier: 14.0.1
     version: 14.0.1(@opentelemetry/api@1.7.0)(react-dom@18.2.0)(react@18.2.0)
@@ -139,29 +139,42 @@ packages:
     resolution: {integrity: sha512-e8vfKbjnbYiyneBincEFS0tzXluopGK77OkVFbPRtUbNDS5tJfb+jiwOQEiqASDsadcZmd+9J9+Q6v/z7GuN2g==}
     dev: true
 
-  /@effect/opentelemetry@0.21.1(@opentelemetry/api@1.7.0)(effect@2.0.0-next.52):
-    resolution: {integrity: sha512-LrIPTlT6aICAdeug2Xugclvgt7udphNu6lUiFfGmA5RjFkJKv76gAYUiNd2GEDoshtEOnUj+xtjgdMjF37hbNg==}
+  /@effect/opentelemetry@0.25.1(@opentelemetry/api@1.7.0)(@opentelemetry/resources@1.18.1)(@opentelemetry/sdk-metrics@1.18.1)(@opentelemetry/sdk-trace-base@1.18.1)(@opentelemetry/semantic-conventions@1.18.1)(effect@2.0.0-next.58):
+    resolution: {integrity: sha512-5mxfB1xsRORhaul+ZnRi2LlYKGElw8uKv+4VljZBwVlEQKP97Kpyiipaso70cB/vwjKojHbbjEaWKwXLncO7Uw==}
     peerDependencies:
-      '@opentelemetry/api': ^1.4
-      effect: 2.0.0-next.52
+      '@opentelemetry/api': ^1.6
+      '@opentelemetry/resources': ^1.17
+      '@opentelemetry/sdk-metrics': ^1.17
+      '@opentelemetry/sdk-trace-base': ^1.17
+      '@opentelemetry/sdk-trace-node': ^1.17
+      '@opentelemetry/sdk-trace-web': ^1.17
+      '@opentelemetry/semantic-conventions': ^1.17
+      effect: 2.0.0-next.58
+    peerDependenciesMeta:
+      '@opentelemetry/sdk-metrics':
+        optional: true
+      '@opentelemetry/sdk-trace-base':
+        optional: true
+      '@opentelemetry/sdk-trace-node':
+        optional: true
+      '@opentelemetry/sdk-trace-web':
+        optional: true
     dependencies:
       '@opentelemetry/api': 1.7.0
       '@opentelemetry/resources': 1.18.1(@opentelemetry/api@1.7.0)
       '@opentelemetry/sdk-metrics': 1.18.1(@opentelemetry/api@1.7.0)
       '@opentelemetry/sdk-trace-base': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/sdk-trace-node': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/sdk-trace-web': 1.18.1(@opentelemetry/api@1.7.0)
       '@opentelemetry/semantic-conventions': 1.18.1
-      effect: 2.0.0-next.52
+      effect: 2.0.0-next.58
     dev: false
 
-  /@effect/schema@0.46.4(effect@2.0.0-next.52)(fast-check@3.14.0):
-    resolution: {integrity: sha512-luaLVNgFxhYQs+W8qZHGQXBOTMmTLq02hQkadSSALQn3fUkQQ0dAJpBgqzN+zduQxZbsn8z1PyBHBgQOxotk1g==}
+  /@effect/schema@0.51.4(effect@2.0.0-next.58)(fast-check@3.14.0):
+    resolution: {integrity: sha512-3YRgmCGpKmnnsabSv1Omod3HQVMwSbYNMexiQ9Z+qnwyAEGbLt8r6WK9PMIZuoE3VrssDP8r1PmGdMe5lkkWAg==}
     peerDependencies:
-      effect: 2.0.0-next.52
+      effect: 2.0.0-next.58
       fast-check: ^3.13.2
     dependencies:
-      effect: 2.0.0-next.52
+      effect: 2.0.0-next.58
       fast-check: 3.14.0
     dev: false
 
@@ -633,16 +646,6 @@ packages:
       '@opentelemetry/core': 1.17.1(@opentelemetry/api@1.7.0)
     dev: false
 
-  /@opentelemetry/propagator-jaeger@1.18.1(@opentelemetry/api@1.7.0):
-    resolution: {integrity: sha512-Kh4M1Qewv0Tbmts6D8LgNzx99IjdE18LCmY/utMkgVyU7Bg31Yuj+X6ZyoIRKPcD2EV4rVkuRI16WVMRuGbhWA==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.0.0 <1.8.0'
-    dependencies:
-      '@opentelemetry/api': 1.7.0
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.7.0)
-    dev: false
-
   /@opentelemetry/resources@1.17.1(@opentelemetry/api@1.7.0):
     resolution: {integrity: sha512-M2e5emqg5I7qRKqlzKx0ROkcPyF8PbcSaWEdsm72od9txP7Z/Pl8PDYOyu80xWvbHAWk5mDxOF6v3vNdifzclA==}
     engines: {node: '>=14'}
@@ -766,33 +769,6 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@opentelemetry/sdk-trace-node@1.18.1(@opentelemetry/api@1.7.0):
-    resolution: {integrity: sha512-ML0l9TNlfLoplLF1F8lb95NGKgdm6OezDS3Ymqav9sYxMd5bnH2LZVzd4xEF+ov5vpZJOGdWxJMs2nC9no7+xA==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.0.0 <1.8.0'
-    dependencies:
-      '@opentelemetry/api': 1.7.0
-      '@opentelemetry/context-async-hooks': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/propagator-b3': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/propagator-jaeger': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/sdk-trace-base': 1.18.1(@opentelemetry/api@1.7.0)
-      semver: 7.5.4
-    dev: false
-
-  /@opentelemetry/sdk-trace-web@1.18.1(@opentelemetry/api@1.7.0):
-    resolution: {integrity: sha512-WN30vxy4NY8TqFWuICXaPXjBdy6A5kDhxOqp4NfhqXfpcWWT0GqSgv05Q42quWYOFgaulnmPRRJwxzAdhBliLQ==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.0.0 <1.8.0'
-    dependencies:
-      '@opentelemetry/api': 1.7.0
-      '@opentelemetry/core': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/sdk-trace-base': 1.18.1(@opentelemetry/api@1.7.0)
-      '@opentelemetry/semantic-conventions': 1.18.1
-    dev: false
-
   /@opentelemetry/semantic-conventions@1.17.1:
     resolution: {integrity: sha512-xbR2U+2YjauIuo42qmE8XyJK6dYeRMLJuOlUP5SO4auET4VtOHOzgkRVOq+Ik18N+Xf3YPcqJs9dZMiDddz1eQ==}
     engines: {node: '>=14'}
@@ -850,22 +826,22 @@ packages:
     resolution: {integrity: sha512-2/U3GXA6YiPYQDLGwtGlnNgKYBSwCFIHf8Y9LUY5VATHdtbLlU0Y1R3QoBnT0aB4qv/BEiVVsj7LJXoQCgJ2vA==}
     dev: true
 
-  /@sqlfx/sql@0.29.1(@effect/schema@0.46.4)(effect@2.0.0-next.52):
-    resolution: {integrity: sha512-RWbRabUbAufJe9CNkT102WQpUYsFHcIQQ7lUrnJcMAGkE56m/c7XopAFXpM2oFH4mGPCsS2Wu2qa54qJHAArqA==}
+  /@sqlfx/sql@0.33.1(@effect/schema@0.51.4)(effect@2.0.0-next.58):
+    resolution: {integrity: sha512-Lg4jBwajopBenoDgLITgeXU1/OhSwaXWhR+ZEWQ75Rah4fhmf5n4c/6UHB/h1E6MPZ1LLJHOU5JU+qrIKgeGMw==}
     peerDependencies:
-      '@effect/schema': ^0.46.1
-      effect: 2.0.0-next.52
+      '@effect/schema': ^0.51.1
+      effect: 2.0.0-next.58
     dependencies:
-      '@effect/schema': 0.46.4(effect@2.0.0-next.52)(fast-check@3.14.0)
-      effect: 2.0.0-next.52
+      '@effect/schema': 0.51.4(effect@2.0.0-next.58)(fast-check@3.14.0)
+      effect: 2.0.0-next.58
     dev: false
 
-  /@sqlfx/sqlite@0.29.1(@effect/schema@0.46.4)(better-sqlite3@9.2.2)(effect@2.0.0-next.52):
-    resolution: {integrity: sha512-6B5hnDTGjdGwWwM8bSBFTW/iI9xTV8uGEYAN+A/L0sMTBS63RUVsWso5kEqCYhBKT+qonIIMCe3DOM4f9e15CA==}
+  /@sqlfx/sqlite@0.33.1(@effect/schema@0.51.4)(better-sqlite3@9.2.2)(effect@2.0.0-next.58):
+    resolution: {integrity: sha512-2C0MKgPbwK7KLMA8EZRBVQOnXb2thcX+gRzzUAxEutXrH3JOMUEixjtvimqM2YLt3+pWDrBtwy4Eu1SzhOB2fQ==}
     peerDependencies:
-      '@sqlite.org/sqlite-wasm': ^3.43.2-build1
+      '@sqlite.org/sqlite-wasm': 3.44.2-build1
       better-sqlite3: ^9
-      effect: 2.0.0-next.52
+      effect: 2.0.0-next.58
       expo-sqlite: ^11
       react-native-quick-sqlite: ^8
     peerDependenciesMeta:
@@ -878,9 +854,9 @@ packages:
       react-native-quick-sqlite:
         optional: true
     dependencies:
-      '@sqlfx/sql': 0.29.1(@effect/schema@0.46.4)(effect@2.0.0-next.52)
+      '@sqlfx/sql': 0.33.1(@effect/schema@0.51.4)(effect@2.0.0-next.58)
       better-sqlite3: 9.2.2
-      effect: 2.0.0-next.52
+      effect: 2.0.0-next.58
     transitivePeerDependencies:
       - '@effect/schema'
     dev: false
@@ -1498,8 +1474,8 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
-  /effect@2.0.0-next.52:
-    resolution: {integrity: sha512-6VmmfS6xyOZsJRT0hcEsMx03HxXSeG/VmcniDvVw0nzBudlu+4qUvj8GBGYVFVgJfKcISSRey0tzfO9HXIzApg==}
+  /effect@2.0.0-next.58:
+    resolution: {integrity: sha512-3JtlhJWIZlKe2krJp8ZsKCWCsKMemRVMNOGKtW6bLbg1ZYDi9riuDO44heqEyh7mVBhGsLh/Ut+Hz4olFbfhyg==}
     dev: false
 
   /electron-to-chromium@1.4.603:

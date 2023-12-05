@@ -1,5 +1,5 @@
 import { Schema } from "@effect/schema";
-import { Context, Data, Effect, Layer, Metric } from "effect";
+import { Context, Effect, Layer, Metric } from "effect";
 import { Sql, SqlLive } from "./Sql";
 
 //
@@ -18,9 +18,10 @@ export class Todo extends Schema.Class<Todo>()({
 
 export const TodoArray = Schema.array(Todo);
 
-export class GetAllTodosError extends Data.TaggedError("GetAllTodosError")<{
-  message: string;
-}> {}
+export class GetAllTodosError extends Schema.TaggedError<GetAllTodosError>()(
+  "GetAllTodosError",
+  { message: Schema.string }
+) {}
 
 //
 // Metrics
@@ -86,18 +87,18 @@ export const makeTodoRepo = Effect.gen(function* ($) {
     Effect.gen(function* ($) {
       yield* $(
         Effect.orDie(sql`UPDATE todos SET status = ${status} WHERE id = ${id}`),
-        Effect.withSpan("completeFromDb")
+        Effect.withSpan("updateTodosStatement")
       );
     }).pipe(
       sql.withTransaction,
       Metric.trackErrorWith(completeTodoErrorCount, () => 1),
-      Effect.withSpan("completeTodo")
+      Effect.withSpan("updateTodo")
     );
 
   const getAllTodos = Effect.gen(function* ($) {
     const rows = yield* $(
       Effect.orDie(sql`SELECT * from todos;`),
-      Effect.withSpan("getFromDb")
+      Effect.withSpan("selectTodosStatement")
     );
     const todos = yield* $(
       Effect.orDie(Schema.parse(TodoArray)(rows)),
@@ -117,7 +118,6 @@ export const makeTodoRepo = Effect.gen(function* ($) {
   };
 });
 
-export const TodoRepoLive = Layer.provide(
-  SqlLive,
-  Layer.effect(TodoRepo, makeTodoRepo)
+export const TodoRepoLive = Layer.effect(TodoRepo, makeTodoRepo).pipe(
+  Layer.provide(SqlLive)
 );
