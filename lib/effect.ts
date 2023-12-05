@@ -127,10 +127,13 @@ const nextRuntime: {
   } as any;
 };
 
-export const integrate = <E, R, E1, R1>(
-  globalLayer: Layer.Layer<never, E, R>,
-  localLayer: Layer.Layer<R, E1, R1>
-) => {
+export const integrate = <E, R, E1, R1>({
+  globalLayer,
+  localLayer,
+}: {
+  globalLayer: Layer.Layer<never, E, R>;
+  localLayer: Layer.Layer<R, E1, R1>;
+}) => {
   const { childRuntime } = globalValue("@app/GlobalRuntime", () =>
     nextRuntime(globalLayer)
   );

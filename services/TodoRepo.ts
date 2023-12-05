@@ -1,13 +1,5 @@
 import { Schema } from "@effect/schema";
-import {
-  Context,
-  Data,
-  Duration,
-  Effect,
-  Layer,
-  Metric,
-  Schedule,
-} from "effect";
+import { Context, Data, Effect, Layer, Metric } from "effect";
 import { Sql, SqlLive } from "./Sql";
 
 //

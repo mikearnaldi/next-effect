@@ -4,7 +4,7 @@ import { SqlLive } from "./Sql";
 import { TodoRepoLive } from "./TodoRepo";
 import { TracingLive } from "./Tracing";
 
-export const { effectComponent, effectAction } = integrate(
-  TracingLive.pipe(Layer.provideMerge(SqlLive)),
-  Layer.mergeAll(TodoRepoLive)
-);
+export const { effectComponent, effectAction } = integrate({
+  globalLayer: SqlLive.pipe(Layer.provide(TracingLive)),
+  localLayer: Layer.mergeAll(TodoRepoLive),
+});
