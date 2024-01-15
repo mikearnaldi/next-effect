@@ -1,5 +1,5 @@
 import { Schema } from "@effect/schema";
-import { Context, Effect, Layer, Metric } from "effect";
+import { Context, Effect, Layer, Metric, Schedule } from "effect";
 import { Sql, SqlLive } from "./Sql";
 
 //
@@ -96,6 +96,9 @@ export const makeTodoRepo = Effect.gen(function* ($) {
     );
 
   const getAllTodos = Effect.gen(function* ($) {
+    if (Math.random() > 0.5) {
+      return yield* $(new GetAllTodosError({ message: "My Random Error..." }));
+    }
     const rows = yield* $(
       Effect.orDie(sql`SELECT * from todos;`),
       Effect.withSpan("selectTodosStatement")
@@ -107,7 +110,8 @@ export const makeTodoRepo = Effect.gen(function* ($) {
     return todos;
   }).pipe(
     Metric.trackErrorWith(getAllTodosErrorCount, () => 1),
-    Effect.withSpan("getAllTodos")
+    Effect.withSpan("getAllTodos"),
+    Effect.retry(Schedule.exponential("10 millis"))
   );
 
   return {

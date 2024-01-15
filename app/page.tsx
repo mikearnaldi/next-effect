@@ -31,5 +31,5 @@ export default effectComponent(
         </section>
       </section>
     );
-  })
+  }).pipe(Effect.withSpan("indexPage"))
 );
