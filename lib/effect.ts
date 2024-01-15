@@ -27,6 +27,7 @@ export const formData = <I extends { [k: string]: string }, A>(
   );
 
 export interface NextRuntime<R> {
+  cleanup: Effect.Effect<never, never, void>;
   runEffect: <E, A>(body: Effect.Effect<R, E, A>) => Promise<A>;
   runtime: Promise<Runtime.Runtime<R> & { scope: CloseableScope }>;
   childRuntime: {
@@ -64,7 +65,7 @@ const nextRuntime: {
   const layer: Layer.Layer<never, any, any> =
     arguments.length === 1 ? arguments[0] : arguments[1];
 
-  const parent =
+  const parent: Promise<Runtime.Runtime<any>> =
     arguments.length === 1 ? Promise.resolve(defaultRuntime) : arguments[0];
 
   const makeRuntime = parent.then((runtime: Runtime.Runtime<any>) =>
@@ -102,6 +103,10 @@ const nextRuntime: {
   };
 
   return {
+    cleanup: Effect.flatMap(
+      Effect.promise(() => makeRuntime),
+      ({ scope }) => Scope.close(scope, Exit.unit)
+    ),
     runEffect: run,
     runtime: makeRuntime,
     childRuntime: (layer: any) => nextRuntime(makeRuntime, layer),
@@ -127,20 +132,32 @@ const nextRuntime: {
   } as any;
 };
 
-export const integrate = <E, R, E1, R1>({
-  globalLayer,
-  localLayer,
-}: {
-  globalLayer: Layer.Layer<never, E, R>;
-  localLayer: Layer.Layer<R, E1, R1>;
-}) => {
-  const { childRuntime } = globalValue("@app/GlobalRuntime", () =>
-    nextRuntime(globalLayer)
-  );
+export const integrate = <E, R, E1, R1>(
+  globalLayer: Layer.Layer<never, E, R>,
+  localLayer: Layer.Layer<R, E1, R1>
+) => {
+  const { childRuntime } = globalValue("@app/GlobalRuntime", () => {
+    const runtime = nextRuntime(globalLayer);
+    const hook = () => {
+      const cleanupId = "runtime/cleanup";
+      if (cleanupId in globalThis) {
+        return;
+      }
+      Object.assign(globalThis, { cleanupId: true });
+      Effect.runFork(
+        Effect.tap(runtime.cleanup, () =>
+          Effect.sync(() => {
+            process.exit(0);
+          })
+        )
+      );
+    };
+    process.once("SIGTERM", hook);
+    process.once("SIGINT", hook);
+    return runtime;
+  });
 
-  const makeLocalRuntime = () => childRuntime(localLayer);
-
-  const { effectComponent, effectAction } = makeLocalRuntime();
+  const { effectComponent, effectAction } = childRuntime(localLayer);
 
   return { effectComponent, effectAction };
 };

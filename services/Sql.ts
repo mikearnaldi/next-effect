@@ -1,5 +1,5 @@
 import * as Sqlfx from "@sqlfx/sqlite/node";
-import { Config, Layer } from "effect";
+import { Config } from "effect";
 
 export const Sql = Sqlfx.tag;
 
@@ -9,4 +9,4 @@ export const SqlLive = Sqlfx.makeLayer({
   ),
   transformQueryNames: Config.succeed(Sqlfx.transform.camelToSnake),
   transformResultNames: Config.succeed(Sqlfx.transform.snakeToCamel),
-}).pipe(Layer.orDie);
+});

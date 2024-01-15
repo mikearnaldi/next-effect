@@ -12,8 +12,8 @@ export class Todo extends Schema.Class<Todo>()({
   id: Schema.number,
   title: Schema.string,
   status: TodoStatus,
-  createdAt: Schema.dateFromString(Schema.string),
-  updatedAt: Schema.dateFromString(Schema.string),
+  createdAt: Schema.DateFromString,
+  updatedAt: Schema.DateFromString,
 }) {}
 
 export const TodoArray = Schema.array(Todo);
